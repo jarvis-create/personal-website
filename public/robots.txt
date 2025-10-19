@@ -1,5 +1,5 @@
-# robots.txt for https://your-domain.com
+# robots.txt for https://oluwafemijoshua.pages.dev
 User-agent: *
 Allow: /
 
-Sitemap: https://your-domain.com/sitemap.xml
+Sitemap: https://oluwafemijoshua.pages.dev/sitemap.xml
