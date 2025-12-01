@@ -14,7 +14,7 @@ const links = [
     icon: Linkedin,
     label: "LinkedIn",
     value: "Connect",
-    href: "https://linkedin.com/in/oluwafemijoshua",
+    href: "https://linkedin.com/in/oluwafemi-joshua",
   },
   {
     icon: FileText,
