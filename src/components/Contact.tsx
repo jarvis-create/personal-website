@@ -20,7 +20,7 @@ const links = [
     icon: FileText,
     label: "Medium",
     value: "Read",
-    href: "https://medium.com/oluwafemi-joshua",
+    href: "https://medium.com/@oluwafemi-joshua",
   },
   {
     icon: Newspaper,
