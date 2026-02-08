@@ -8,7 +8,7 @@ const articles = [
     date: "Oct 2025",
     excerpt:
       "The best evals come from teams who have done the hard work of truly understanding their problem space",
-    href: "https://medium.com",
+    href: "https://medium.com/@oluwafemi-joshua/principle-zero-evals-are-all-you-need-d57d989d693e",
   },
   {
     title: "Probing The Need for a Better Digital Life Archive",
@@ -16,7 +16,7 @@ const articles = [
     date: "Oct 2025",
     excerpt:
       "For some time now, I have been oddly fascinated with death and how it interacts with the lives we live",
-    href: "https://medium.com",
+    href: "https://medium.com/@oluwafemi-joshua/i2p-probing-the-need-for-a-better-digital-life-archive-part-1-6c3cd941db90",
   },
   {
     title: "Don't Drown",
@@ -24,7 +24,7 @@ const articles = [
     date: "June 2025",
     excerpt:
       "At first thought, it feels like it should be natural to self, and that we should, by Gaias default, want love for ourselves and seek that love like the blood-crazed sharks I'm starting to think we are.",
-    href: "https://substack.com",
+    href: "https://open.substack.com/pub/oluwafemijoshua/p/dont-stop-drowning?utm_campaign=post-expanded-share&utm_medium=web",
   },
 ];
 
