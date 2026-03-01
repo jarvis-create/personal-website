@@ -31,6 +31,8 @@ const links = [
 ];
 
 export function Contact() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <section className="relative py-24 px-6 bg-gradient-to-b from-[#0a0a0a] via-[#1a0a1f] to-[#0a0a0a] min-h-[80vh] flex items-center">
       <motion.div
@@ -220,7 +222,7 @@ export function Contact() {
           transition={{ duration: 1, delay: 0.5 }}
         >
           <p className="font-mono text-[#ff6b35]/40">
-            © 2025 · Oluwafemi Joshua
+            © {currentYear} · Oluwafemi Joshua
           </p>
         </motion.div>
       </div>
