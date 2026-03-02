@@ -331,6 +331,20 @@ body::before {
   .v-rule { opacity: 0; animation: fadein 1.2s ease forwards 0.3s; }
 }
 
+/* Skip entrance animations on revisit — instant render */
+.page.revisit .name-block,
+.page.revisit .status-block,
+.page.revisit .centre-kicker,
+.page.revisit .centre-headline,
+.page.revisit .centre-roleline,
+.page.revisit .centre-question,
+.page.revisit .centre-nav,
+.page.revisit .bottom-bar,
+.page.revisit .v-rule {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
 /* ── WORK PAGE: RAIL (fixed left sidebar) ── */
 .rail {
   position: fixed;
@@ -373,14 +387,7 @@ body::before {
 .rn-num { font-size: 9px; color: rgba(255,255,255,0.12); flex-shrink: 0; }
 .rn.active .rn-num { color: var(--accent-muted); }
 
-.rail-back {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px; letter-spacing: 0.14em;
-  color: rgba(255,255,255,0.28); text-decoration: none;
-  text-transform: uppercase; display: block;
-  margin-bottom: 14px; transition: color 0.2s;
-}
-.rail-back:hover { color: var(--accent-muted); }
+/* .rail-back replaced by unified .nav-back */
 .rail-cta {
   font-family: 'DM Mono', monospace;
   font-size: 10px; letter-spacing: 0.14em;
@@ -527,7 +534,7 @@ body::before {
   pointer-events: none;
 }
 
-.about-close,
+/* .about-close replaced by unified .nav-back */
 .about-cta {
   border-bottom: 1px solid rgba(224, 176, 137, 0.45);
   color: #e0b089;
@@ -902,6 +909,42 @@ footer a {
 }
 footer a:hover { color: var(--accent); }
 
+/* ── UNIFIED BACK BUTTON ── */
+.nav-back {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 6px 14px;
+  border-radius: 20px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  width: fit-content;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.nav-back:hover {
+  color: var(--accent-muted);
+  border-color: rgba(212, 149, 106, 0.4);
+  background: rgba(255,255,255,0.04);
+}
+
+/* Light background variant (for pages with --paper bg) */
+.nav-back--light {
+  color: var(--ink-faint);
+  border-color: var(--rule);
+}
+.nav-back--light:hover {
+  color: var(--accent);
+  border-color: rgba(139, 58, 42, 0.3);
+  background: rgba(139, 58, 42, 0.04);
+}
+
 /* ── ANIMATIONS ── */
 @keyframes up {
   from { opacity: 0; transform: translateY(14px); }
@@ -974,20 +1017,7 @@ footer a:hover { color: var(--accent); }
   color: var(--accent-muted);
 }
 
-.wp-back {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: rgba(255,255,255,0.25);
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: color 0.2s;
-  flex-shrink: 0;
-}
-
-.wp-back:hover {
-  color: var(--accent-muted);
-}
+/* .wp-back replaced by unified .nav-back */
 
 /* Body - Two columns */
 .wp-body {
@@ -1340,20 +1370,7 @@ footer a:hover { color: var(--accent); }
   color: var(--accent);
 }
 
-.sp-close {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: var(--ink-faint);
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: color 0.2s;
-  margin-top: 8px;
-}
-
-.sp-close:hover {
-  color: var(--accent);
-}
+/* .sp-close replaced by unified .nav-back */
 
 /* Projects Grid */
 .sp-grid {
@@ -1638,4 +1655,524 @@ footer a:hover { color: var(--accent); }
     font-size: 18px;
     padding: 20px 0;
   }
+}
+
+/* ══════════════════════════════════════════════
+   SHELF PAGE
+   ══════════════════════════════════════════════ */
+
+/* ── Hero ── */
+.sh-hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 60px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sh-back { position: absolute; top: 90px; left: 60px; }
+
+.sh-hero-bg-text {
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%);
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(100px, 18vw, 260px);
+  font-weight: 700;
+  font-style: italic;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(139,58,42,0.1);
+  white-space: nowrap;
+  pointer-events: none;
+  letter-spacing: -0.02em;
+}
+
+.sh-hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sh-hero-eyebrow::before {
+  content: '';
+  display: block;
+  width: 30px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.sh-hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(52px, 8vw, 110px);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+.sh-hero-title em {
+  font-style: italic;
+  color: #c4614a;
+  display: block;
+}
+
+.sh-hero-desc {
+  margin-top: 36px;
+  max-width: 400px;
+  color: var(--ink-faint);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  border-left: 2px solid #c4614a;
+  padding-left: 20px;
+}
+
+.sh-hero-scroll {
+  position: absolute;
+  bottom: 40px;
+  right: 60px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  writing-mode: vertical-rl;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sh-hero-scroll::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 60px;
+  background: var(--ink-faint);
+  opacity: 0.5;
+  animation: sh-scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes sh-scrollPulse {
+  0%, 100% { opacity: 0.5; transform: scaleY(1); }
+  50% { opacity: 0.2; transform: scaleY(0.6); }
+}
+
+/* ── Divider ── */
+.sh-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(139,58,42,0.25), transparent);
+}
+
+/* ── Sections ── */
+.sh-section {
+  padding: 100px 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sh-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 60px;
+}
+
+.sh-section-number {
+  font-family: 'Playfair Display', serif;
+  font-size: 72px;
+  font-weight: 700;
+  font-style: italic;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(139,58,42,0.28);
+  line-height: 1;
+}
+
+.sh-section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.sh-sublabel {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 20px;
+}
+
+/* ── Featured book card ── */
+.sh-featured {
+  background: var(--paper-warm);
+  border-radius: 3px;
+  padding: 40px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s;
+  margin-bottom: 70px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.sh-featured:hover { transform: translateY(-3px); }
+.sh-featured::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--accent);
+}
+
+.sh-featured-ghost {
+  position: absolute;
+  right: -10px;
+  top: -15px;
+  font-family: 'Playfair Display', serif;
+  font-size: 130px;
+  font-weight: 700;
+  font-style: italic;
+  color: rgba(139,58,42,0.05);
+  pointer-events: none;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.sh-featured-tag {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 2px;
+  margin-bottom: 18px;
+}
+
+.sh-featured-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0 0 10px;
+  color: var(--ink);
+}
+
+.sh-featured-author {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin: 0;
+}
+.sh-featured-author span {
+  color: #c4614a;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-left: 10px;
+}
+
+.sh-progress-wrap {
+  text-align: right;
+  flex-shrink: 0;
+}
+.sh-progress-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+.sh-progress-bar {
+  width: 80px;
+  height: 2px;
+  background: rgba(139,58,42,0.15);
+  border-radius: 1px;
+  margin-left: auto;
+}
+.sh-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 1px;
+  width: 58%;
+}
+
+/* ── Book items ── */
+.sh-book {
+  display: grid;
+  grid-template-columns: 36px 1fr 20px;
+  align-items: baseline;
+  gap: 20px;
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(26,22,18,0.08);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: var(--ink);
+}
+.sh-book:first-of-type { border-top: 1px solid rgba(26,22,18,0.08); }
+.sh-book:hover .sh-book-title { color: var(--accent); }
+.sh-book:hover .sh-book-num { color: var(--accent); }
+.sh-book:hover .sh-book-arr { color: var(--accent); transform: translateX(4px); }
+
+.sh-book-num {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: rgba(26,22,18,0.22);
+  transition: color 0.2s;
+}
+
+.sh-book-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.2;
+  transition: color 0.2s;
+  margin-bottom: 4px;
+}
+
+.sh-book-author {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.sh-book-series {
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #c4614a;
+  margin-left: 8px;
+}
+
+.sh-book-arr {
+  font-size: 13px;
+  color: rgba(26,22,18,0.12);
+  transition: all 0.2s;
+}
+
+/* ── Music grid ── */
+.sh-music-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.sh-music-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 0;
+  border-bottom: 1px solid rgba(26,22,18,0.08);
+  gap: 20px;
+}
+.sh-music-item:nth-child(odd) {
+  padding-right: 40px;
+  border-right: 1px solid rgba(26,22,18,0.08);
+}
+.sh-music-item:nth-child(even) {
+  padding-left: 40px;
+}
+.sh-music-item--last {
+  border-bottom: none;
+}
+
+.sh-music-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.sh-music-tag {
+  border: 1px solid rgba(26,22,18,0.18);
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 20px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* ── Playlist card ── */
+.sh-playlist {
+  background: var(--accent);
+  color: white;
+  border-radius: 3px;
+  padding: 36px 44px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 60px;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.2s;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+}
+.sh-playlist:hover {
+  transform: translateY(-3px);
+  background: #7d3424;
+  color: white;
+}
+.sh-playlist::after {
+  content: '\266B';
+  position: absolute;
+  right: 30px;
+  bottom: -15px;
+  font-size: 110px;
+  opacity: 0.07;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.sh-play-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  color: var(--accent);
+  padding-left: 3px;
+}
+
+.sh-pl-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 6px;
+}
+
+.sh-pl-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  font-style: italic;
+  margin-bottom: 6px;
+}
+
+.sh-pl-desc {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  opacity: 0.72;
+  max-width: 380px;
+  line-height: 1.7;
+}
+
+.sh-pl-arr {
+  margin-left: auto;
+  font-size: 18px;
+  opacity: 0.5;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.sh-playlist:hover .sh-pl-arr {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+/* ── Footer CTA (writing page) ── */
+
+.wp-footer-cta {
+  color: var(--accent-muted) !important;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.wp-footer-cta:hover {
+  color: #fff !important;
+}
+
+/* ── Footer CTA (side projects page) ── */
+
+.sp-footer-cta {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--accent-muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+.sp-footer-cta:hover {
+  color: var(--accent);
+}
+
+/* ── Shelf responsive ── */
+
+@media (max-width: 900px) {
+  .sh-music-grid {
+    grid-template-columns: 1fr;
+  }
+  .sh-music-item:nth-child(odd) {
+    padding-right: 0;
+    border-right: none;
+  }
+  .sh-music-item:nth-child(even) {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .sh-hero {
+    padding: 0 28px 60px;
+  }
+  .sh-back { left: 28px; top: 80px; }
+  .sh-hero-title {
+    font-size: clamp(40px, 10vw, 60px);
+  }
+  .sh-hero-scroll { display: none; }
+  .sh-hero-bg-text { font-size: clamp(60px, 14vw, 120px); }
+  .sh-section {
+    padding: 60px 28px;
+  }
+  .sh-section-number { font-size: 48px; }
+  .sh-featured {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px 24px;
+    gap: 20px;
+  }
+  .sh-featured-title { font-size: 28px; }
+  .sh-progress-wrap { align-self: flex-end; }
+  .sh-book { grid-template-columns: 28px 1fr 16px; gap: 12px; }
+  .sh-book-title { font-size: 20px; }
+  .sh-music-name { font-size: 22px; }
+  .sh-playlist {
+    flex-direction: column;
+    text-align: center;
+    padding: 28px 20px;
+    gap: 16px;
+  }
+  .sh-pl-arr { display: none; }
+  .sh-aside { padding: 60px 28px; }
 }

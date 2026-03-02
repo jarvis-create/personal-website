@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./styles/editorial.css";
 
 /**
@@ -10,6 +10,7 @@ import "./styles/editorial.css";
  */
 export default function Prototype() {
   const [route, setRoute] = useState<"home" | "work" | "writing" | "about" | "side-projects" | "shelf">("home");
+  const homeVisitCount = useRef(0);
 
   useEffect(() => {
     const parse = () => {
@@ -80,7 +81,7 @@ export default function Prototype() {
   return (
     <div className="site">
 
-      {route === "home" && <Home />}
+      {route === "home" && <Home revisit={homeVisitCount.current++ > 0} />}
       {route === "work" && <WorkPage />}
       {route === "about" && <AboutPage />}
       {route === "side-projects" && <SideProjectsPage />}
@@ -96,36 +97,13 @@ const TYPED_LINES = [
   "Building products in early-stage and growth environments since 2021.",
 ];
 
-function useTypedLine(lines: string[]) {
+function useTypedLine(lines: string[], skipInitialDelay = false) {
   const ref = useRef<HTMLSpanElement>(null);
-
-  const type = useCallback(
-    (text: string): Promise<void> =>
-      new Promise((resolve) => {
-        let i = 0;
-        const id = setInterval(() => {
-          if (!ref.current) { clearInterval(id); return; }
-          ref.current.textContent += text[i++];
-          if (i >= text.length) { clearInterval(id); resolve(); }
-        }, 30);
-      }),
-    []
-  );
-
-  const erase = useCallback(
-    (): Promise<void> =>
-      new Promise((resolve) => {
-        const id = setInterval(() => {
-          if (!ref.current) { clearInterval(id); return; }
-          ref.current.textContent = ref.current.textContent!.slice(0, -1);
-          if (!ref.current.textContent!.length) { clearInterval(id); resolve(); }
-        }, 18);
-      }),
-    []
-  );
+  const cancelledRef = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
+    cancelledRef.current = false;
+    if (ref.current) ref.current.textContent = "";
 
     // Respect prefers-reduced-motion: show first line statically
     const prefersReducedMotion = window.matchMedia(
@@ -137,40 +115,75 @@ function useTypedLine(lines: string[]) {
       return;
     }
 
-    async function cycle() {
-      let idx = 0;
-      // Initial pause before typing starts
-      await delay(1600);
-      while (!cancelled) {
-        await type(lines[idx]);
-        await delay(3200); // pause to read
-        await erase();
-        await delay(400); // brief gap between lines
-        idx = (idx + 1) % lines.length;
-      }
+    const timers: number[] = [];
+
+    function typeText(text: string): Promise<void> {
+      return new Promise((resolve) => {
+        let i = 0;
+        const id = setInterval(() => {
+          if (cancelledRef.current || !ref.current) { clearInterval(id); return; }
+          ref.current.textContent += text[i++];
+          if (i >= text.length) { clearInterval(id); resolve(); }
+        }, 30) as unknown as number;
+        timers.push(id);
+      });
+    }
+
+    function eraseText(): Promise<void> {
+      return new Promise((resolve) => {
+        const id = setInterval(() => {
+          if (cancelledRef.current || !ref.current) { clearInterval(id); return; }
+          ref.current.textContent = ref.current.textContent!.slice(0, -1);
+          if (!ref.current.textContent!.length) { clearInterval(id); resolve(); }
+        }, 18) as unknown as number;
+        timers.push(id);
+      });
     }
 
     function delay(ms: number) {
       return new Promise<void>((resolve) => {
-        const id = setTimeout(resolve, ms);
-        // If cancelled during a delay, we still resolve (the while-loop
-        // condition catches it on the next iteration).
-        void id;
+        const id = setTimeout(() => {
+          if (cancelledRef.current) return;
+          resolve();
+        }, ms) as unknown as number;
+        timers.push(id);
       });
     }
 
+    async function cycle() {
+      let idx = 0;
+      // Skip initial pause on revisit for instant feel
+      if (!skipInitialDelay) {
+        await delay(1600);
+      }
+      while (!cancelledRef.current) {
+        await typeText(lines[idx]);
+        if (cancelledRef.current) break;
+        await delay(3200);
+        if (cancelledRef.current) break;
+        await eraseText();
+        if (cancelledRef.current) break;
+        await delay(400);
+        idx = (idx + 1) % lines.length;
+      }
+    }
+
     cycle();
-    return () => { cancelled = true; };
-  }, [lines, type, erase]);
+
+    return () => {
+      cancelledRef.current = true;
+      timers.forEach((id) => { clearInterval(id); clearTimeout(id); });
+    };
+  }, [lines, skipInitialDelay]);
 
   return ref;
 }
 
-function Home() {
-  const typedRef = useTypedLine(TYPED_LINES);
+function Home({ revisit = false }: { revisit?: boolean }) {
+  const typedRef = useTypedLine(TYPED_LINES, revisit);
 
   return (
-    <div className="page">
+    <div className={`page${revisit ? " revisit" : ""}`}>
       <div className="v-rule"></div>
 
       <div className="status-block">
@@ -184,7 +197,7 @@ function Home() {
           Hi, I'm Oluwafemi Joshua
         </p>
         <h1 className="centre-headline">
-          I build products<br />that become<br /><em>habits.</em>
+          I build products<br />worth getting<br /><em>obsessed with.</em>
         </h1>
         <p className="centre-roleline">Technical Product Manager & <span>Writer</span></p>
         <p className="centre-question">
@@ -291,8 +304,8 @@ function WorkPage() {
           </a>
         </nav>
         <div>
-          <a className="rail-back" href="#/home">← Home</a>
-          <a className="rail-cta" href="mailto:joshuaojo33@gmail.com">
+          <a className="nav-back" href="#/home">← Home</a>
+          <a className="rail-cta" href="https://calendly.com/joshuaojo/15min" target="_blank" rel="noreferrer">
             Start a conversation <span aria-hidden="true">→</span>
           </a>
         </div>
@@ -456,7 +469,7 @@ function AboutPage() {
     <>
       <section className="about-split">
         <aside className="about-left">
-          <a href="#/home" className="about-close" data-hoverable="true">← Close</a>
+          <a href="#/home" className="nav-back" data-hoverable="true">← Back</a>
           <div className="about-metrics">
             <div className="about-metric"><span className="m-num">5</span><span className="m-text">Years building products in early-stage & growth environments</span></div>
             <div className="about-metric"><span className="m-num">35%</span><span className="m-text">Free → paid conversion on 2.3k signups, H1 2024</span></div>
@@ -465,7 +478,7 @@ function AboutPage() {
           </div>
           <div className="about-left-bottom">
             <span className="about-dot" aria-hidden="true"></span>
-            <a href="mailto:joshuaojo33@gmail.com" className="about-cta" data-hoverable="true">Start a conversation →</a>
+            <a href="https://calendly.com/joshuaojo/15min" target="_blank" rel="noreferrer" className="about-cta" data-hoverable="true">Start a conversation →</a>
           </div>
         </aside>
 
@@ -475,9 +488,9 @@ function AboutPage() {
               <img src="/oluwafemi-joshua.png" alt="Oluwafemi Joshua" className="about-photo" />
             </div>
             <p className="about-label">Working with me</p>
-            <h1 className="about-title">The person who asks<br />the question <em>nobody asked.</em></h1>
+            <h1 className="about-title">The PM who makes<br />the team ask<br /><em>better questions.</em></h1>
             <p className="about-copy">I trained as a Chemical Engineer. I came into product through the unglamorous side — requirements gathering, QA, enterprise transformation where the real problem doesn't surface until week three. I like it there.</p>
-            <p className="about-copy">What I bring that doesn't fit a job description: I'll sit with a problem until I find the question nobody else asked. I default to <em>discovery before solution</em>. And I care — genuinely — about the humans behind the metrics.</p>
+            <p className="about-copy">What I bring doesn't fit a job description. I'll sit with a problem until I find the question nobody else asked. I default to <em>discovery before solution</em>. And I care, genuinely, about the humans behind the metrics.</p>
             <p className="about-copy">Currently at Tech1M running product strategy end to end. AI-native products, PLG, and the unglamorous work of making things actually stick.</p>
           </div>
           <div className="about-watermark">OJ</div>
@@ -496,7 +509,7 @@ function WritingPage() {
           <p className="wp-eyebrow">Writing</p>
           <h1 className="wp-title">I write when something<br />bothers me <em>enough.</em></h1>
         </div>
-        <a href="#/home" className="wp-back">← Back</a>
+        <a href="#/home" className="nav-back">← Back</a>
       </header>
 
       {/* Body - Two columns */}
@@ -562,6 +575,7 @@ function WritingPage() {
           <span className="wp-footer-tag">Digital Manuscripts</span>
           <span className="wp-footer-tag">Thought Fragments</span>
           <span className="wp-footer-tag">Encoded Wisdom</span>
+          <a href="https://calendly.com/joshuaojo/15min" target="_blank" rel="noreferrer" className="wp-footer-tag wp-footer-cta">Start a conversation →</a>
         </div>
       </footer>
     </div>
@@ -576,7 +590,7 @@ function SideProjectsPage() {
           <p className="sp-eyebrow">Side Projects</p>
           <h1 className="sp-title">Things I build when<br />nobody's <em>paying me.</em></h1>
         </div>
-        <a href="#/home" className="sp-close">← Close</a>
+        <a href="#/home" className="nav-back nav-back--light">← Back</a>
       </header>
 
       <div className="sp-grid">
@@ -607,6 +621,7 @@ function SideProjectsPage() {
 
       <footer className="sp-footer">
         <p className="sp-footer-text">All three are live questions I can't stop thinking about — not just roadmap items. Ask me about any of them.</p>
+        <a href="https://calendly.com/joshuaojo/15min" target="_blank" rel="noreferrer" className="sp-footer-cta">Start a conversation →</a>
         <span className="sp-footer-dot"></span>
       </footer>
     </section>
@@ -628,23 +643,112 @@ function ShelfPage() {
         </ul>
       </nav>
 
-      <div className="wrap page-hero" style={{ padding: "180px 48px 120px", maxWidth: "680px", margin: "0 auto", minHeight: "80vh" }}>
-        <a className="back" href="#/home" data-hoverable="true" style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", letterSpacing: "0.15em", color: "var(--ink-faint)", textTransform: "uppercase", textDecoration: "none" }}>
-          ← Back
+      {/* ── HERO ── */}
+      <section className="sh-hero">
+        <div className="sh-hero-bg-text" aria-hidden="true">Reading &amp; Listening</div>
+        <a className="nav-back nav-back--light sh-back" href="#/home" data-hoverable="true">← Back</a>
+        <div className="sh-hero-eyebrow">002 / Shelf</div>
+        <h1 className="sh-hero-title">Reading &amp;<br /><em>Listening.</em></h1>
+        <p className="sh-hero-desc">Directory of books I've enjoyed so far and music that I think otherworldly</p>
+        <div className="sh-hero-scroll" aria-hidden="true">Scroll</div>
+      </section>
+
+      <div className="sh-divider" />
+
+      {/* ── READING ── */}
+      <div className="sh-section">
+        <div className="sh-section-header">
+          <span className="sh-section-number">01</span>
+          <span className="sh-section-label">Reading</span>
+        </div>
+
+        <p className="sh-sublabel">Currently on the nightstand</p>
+        <a href="https://www.goodreads.com/book/show/43263178-demon-in-white" target="_blank" rel="noreferrer" className="sh-featured" data-hoverable="true">
+          <div className="sh-featured-ghost" aria-hidden="true">Demon</div>
+          <div>
+            <span className="sh-featured-tag">Reading Now</span>
+            <h3 className="sh-featured-title">Demon in White</h3>
+            <p className="sh-featured-author">Christopher Ruocchio <span>Sun Eater #3</span></p>
+          </div>
+          <div className="sh-progress-wrap">
+            <span className="sh-progress-label">In progress</span>
+            <div className="sh-progress-bar"><div className="sh-progress-fill" /></div>
+          </div>
         </a>
-        <div style={{ height: 18 }} />
-        <div className="label" style={{ fontFamily: "'DM Mono', monospace", fontSize: "10px", letterSpacing: "0.25em", color: "var(--accent-muted)", textTransform: "uppercase", marginBottom: "16px" }}>002 / Shelf</div>
-        <h1 className="title" style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(32px, 4vw, 54px)", fontWeight: 400, lineHeight: 1.12, margin: "0 0 24px", color: "var(--ink)" }}>
-          Reading & Listening
-        </h1>
-        <p className="lede" style={{ fontSize: "18px", lineHeight: 1.9, color: "var(--ink-soft)" }}>
-          A digital garden of things that influence my thinking. Under construction.
-        </p>
+
+        <p className="sh-sublabel">Books that stayed with me</p>
+        <div>
+          <a href="https://www.goodreads.com/book/show/22822858-a-little-life" target="_blank" rel="noreferrer" className="sh-book" data-hoverable="true">
+            <span className="sh-book-num">i</span>
+            <div>
+              <div className="sh-book-title">A Little Life</div>
+              <div className="sh-book-author">Hanya Yanagihara</div>
+            </div>
+            <span className="sh-book-arr">→</span>
+          </a>
+          <a href="https://www.goodreads.com/book/show/33385229-they-both-die-at-the-end" target="_blank" rel="noreferrer" className="sh-book" data-hoverable="true">
+            <span className="sh-book-num">ii</span>
+            <div>
+              <div className="sh-book-title">They Both Die at the End</div>
+              <div className="sh-book-author">Adam Silvera</div>
+            </div>
+            <span className="sh-book-arr">→</span>
+          </a>
+          <a href="https://www.goodreads.com/book/show/35052907-empire-of-silence" target="_blank" rel="noreferrer" className="sh-book" data-hoverable="true">
+            <span className="sh-book-num">iii</span>
+            <div>
+              <div className="sh-book-title">Empire of Silence</div>
+              <div className="sh-book-author">Christopher Ruocchio <span className="sh-book-series">Sun Eater #1</span></div>
+            </div>
+            <span className="sh-book-arr">→</span>
+          </a>
+          <a href="https://www.goodreads.com/book/show/39927451-howling-dark" target="_blank" rel="noreferrer" className="sh-book" data-hoverable="true">
+            <span className="sh-book-num">iv</span>
+            <div>
+              <div className="sh-book-title">Howling Dark</div>
+              <div className="sh-book-author">Christopher Ruocchio <span className="sh-book-series">Sun Eater #2</span></div>
+            </div>
+            <span className="sh-book-arr">→</span>
+          </a>
+        </div>
       </div>
 
-      <footer style={{ padding: "28px 48px", borderTop: "1px solid var(--rule)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <p style={{ margin: 0, fontFamily: "'DM Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", color: "var(--ink-faint)", textTransform: "uppercase" }}>© {currentYear} · Oluwafemi Joshua</p>
-        <p style={{ margin: 0, fontFamily: "'DM Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", color: "var(--ink-faint)", textTransform: "uppercase" }}>#/shelf</p>
+      <div className="sh-divider" />
+
+      {/* ── LISTENING ── */}
+      <div className="sh-section">
+        <div className="sh-section-header">
+          <span className="sh-section-number">02</span>
+          <span className="sh-section-label">Listening</span>
+        </div>
+
+        <p className="sh-sublabel" style={{ marginBottom: 30 }}>On repeat</p>
+        <div className="sh-music-grid">
+          <div className="sh-music-item"><span className="sh-music-name">God Is an Astronaut</span><span className="sh-music-tag">Post-Rock</span></div>
+          <div className="sh-music-item"><span className="sh-music-name">Daughter</span><span className="sh-music-tag">Indie / Alt</span></div>
+          <div className="sh-music-item sh-music-item--last"><span className="sh-music-name">Mogwai</span><span className="sh-music-tag">Post-Rock</span></div>
+        </div>
+
+        <a
+          href="https://music.youtube.com/playlist?list=RDATjuUCTZ0jrJMAcBV7FmSBXwWsaw&playnext=1&si=GFutgQXkrggJBm38"
+          target="_blank"
+          rel="noreferrer"
+          className="sh-playlist"
+          data-hoverable="true"
+        >
+          <div className="sh-play-btn" aria-hidden="true">&#9654;</div>
+          <div>
+            <div className="sh-pl-meta">The Mix</div>
+            <div className="sh-pl-title">Live Playlist</div>
+            <div className="sh-pl-desc">A running mix of everything I'm listening to. Post-rock, ambient — the kind of music that makes you stare out of windows.</div>
+          </div>
+          <span className="sh-pl-arr">→</span>
+        </a>
+      </div>
+
+      <footer>
+        <p>© {currentYear} · Oluwafemi Joshua</p>
+        <a href="https://calendly.com/joshuaojo/15min" target="_blank" rel="noreferrer" data-hoverable="true">Start a conversation →</a>
       </footer>
     </>
   );
