@@ -1,0 +1,51 @@
+# Oluwafemi Joshua
+
+> Technical Product Manager building human-centered technology at the edge of AI.
+
+## About
+
+Oluwafemi Joshua is a Technical Product Manager currently at Tech1M, running product strategy end to end. He trained as a Chemical Engineer and came into product through requirements gathering, QA, and enterprise transformation. He has 5+ years of experience building products in early-stage and growth environments.
+
+He specializes in AI-native products, product-led growth (PLG), LLM evaluation frameworks, and the work of making products actually stick with real users.
+
+## Philosophy
+
+- Defaults to discovery before solution
+- Sits with problems until finding the question nobody else asked
+- Believes the product is never the point — the human problem is
+- Conviction is not certainty — commits fully while staying open to being wrong
+
+## Key Achievements
+
+- 35% free-to-paid conversion on 2,300 signups (H1 2024)
+- $120k pilot revenue closed in under 6 months at Tech1M
+- 50,000+ users on enterprise rollout at Tedbree with 95% CSAT
+- 75% user adoption within 3 months on enterprise deployment
+- Built LLM evaluation and guardrails framework: content relevance, groundedness scoring, PII safeguards, rubric-based output evaluation
+
+## Expertise
+
+- Product Management
+- AI/ML Product Development
+- LLM Evaluation Frameworks
+- Product-Led Growth (PLG)
+- Enterprise Transformation
+- Discovery-Driven Development
+- Human-Centered Design
+- SaaS and B2C Products
+- EdTech
+- RAG (Retrieval-Augmented Generation)
+- Technical Writing
+
+## Writing
+
+Publishes on Medium (product, AI, the work) and Substack (faith, humans, the condition).
+
+## Links
+
+- Website: https://oluwafemijoshua.pages.dev
+- LinkedIn: https://www.linkedin.com/in/oluwafemi-joshua
+- Medium: https://medium.com/@oluwafemi-joshua
+- Substack: https://oluwafemijoshua.substack.com
+- GitHub: https://github.com/jarvis-create
+- Book a call: https://calendly.com/joshuaojo/15min

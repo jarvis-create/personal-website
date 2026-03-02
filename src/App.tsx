@@ -1,37 +1,56 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback, type MouseEvent } from "react";
 import "./styles/editorial.css";
 
-/**
- * Femi Ojo personal site prototype
- * - Home (single screen intro)
- * - Work (essay layout)
- * - Why work with me
- * - Shelf (placeholder)
- */
-export default function Prototype() {
-  const [route, setRoute] = useState<"home" | "work" | "writing" | "about" | "side-projects" | "shelf">("home");
+type Route = "home" | "work" | "writing" | "about" | "side-projects" | "shelf";
+
+function parseRoute(pathname: string): Route {
+  const p = pathname.toLowerCase().replace(/\/+$/, "") || "/";
+  if (p.startsWith("/work")) return "work";
+  if (p.startsWith("/shelf")) return "shelf";
+  if (p.startsWith("/about")) return "about";
+  if (p.startsWith("/side-projects")) return "side-projects";
+  if (p.startsWith("/writing")) return "writing";
+  return "home";
+}
+
+export default function Prototype({ initialPath }: { initialPath?: string } = {}) {
+  const [route, setRoute] = useState<Route>(() => {
+    const path = initialPath ?? (typeof window !== "undefined" ? window.location.pathname : "/");
+    return parseRoute(path);
+  });
   const homeVisitCount = useRef(0);
 
+  // SPA navigation helper — intercepts clicks on internal links
+  const handleNav = useCallback((e: MouseEvent<HTMLElement>) => {
+    const anchor = (e.target as HTMLElement).closest("a");
+    if (!anchor) return;
+    const href = anchor.getAttribute("href");
+    if (!href || !href.startsWith("/") || href.startsWith("//")) return;
+    if (anchor.target === "_blank") return;
+    // In-page scroll anchors (e.g. #origin) — let browser handle
+    if (href.includes("#")) return;
+    e.preventDefault();
+    if (href !== window.location.pathname) {
+      window.history.pushState(null, "", href);
+      setRoute(parseRoute(href));
+    }
+  }, []);
+
+  // Handle legacy hash routes — redirect #/work to /work
   useEffect(() => {
-    const parse = () => {
-      const h = (window.location.hash || "#/home").toLowerCase();
-      if (h.startsWith("#/work")) {
-        setRoute("work");
-      } else if (h.startsWith("#/shelf")) {
-        setRoute("shelf");
-      } else if (h.startsWith("#/about")) {
-        setRoute("about");
-      } else if (h.startsWith("#/side-projects")) {
-        setRoute("side-projects");
-      } else if (h.startsWith("#/writing")) {
-        setRoute("writing");
-      } else {
-        setRoute("home");
-      }
-    };
-    parse();
-    window.addEventListener("hashchange", parse);
-    return () => window.removeEventListener("hashchange", parse);
+    const hash = window.location.hash;
+    if (hash.startsWith("#/")) {
+      const path = hash.slice(1); // "#/work" -> "/work"
+      window.history.replaceState(null, "", path === "/home" ? "/" : path);
+      setRoute(parseRoute(path));
+    }
+  }, []);
+
+  // Handle browser back/forward
+  useEffect(() => {
+    const onPopState = () => setRoute(parseRoute(window.location.pathname));
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
   useEffect(() => {
@@ -79,7 +98,7 @@ export default function Prototype() {
   }, []);
 
   return (
-    <div className="site">
+    <div className="site" onClick={handleNav}>
 
       {route === "home" && <Home revisit={homeVisitCount.current++ > 0} />}
       {route === "work" && <WorkPage />}
@@ -183,7 +202,7 @@ function Home({ revisit = false }: { revisit?: boolean }) {
   const typedRef = useTypedLine(TYPED_LINES, revisit);
 
   return (
-    <div className={`page${revisit ? " revisit" : ""}`}>
+    <main className={`page${revisit ? " revisit" : ""}`}>
       <div className="v-rule"></div>
 
       <div className="status-block">
@@ -193,7 +212,7 @@ function Home({ revisit = false }: { revisit?: boolean }) {
 
       <div className="centre">
         <p className="centre-kicker" style={{ fontWeight: 500 }}>
-          <img src="/favicon.ico" alt="" className="kicker-avatar" aria-hidden="true" />
+          <img src="/favicon.ico" alt="" className="kicker-avatar" aria-hidden="true" width={20} height={20} />
           Hi, I'm Oluwafemi Joshua
         </p>
         <h1 className="centre-headline">
@@ -205,10 +224,10 @@ function Home({ revisit = false }: { revisit?: boolean }) {
           <span className="typed-cursor" aria-hidden="true"></span>
         </p>
         <div className="centre-nav">
-          <a href="#/work" data-hoverable="true">How I work</a>
-          <a href="#/writing" data-hoverable="true">Writing</a>
-          <a href="#/about" data-hoverable="true">Working with me</a>
-          <a href="#/side-projects" data-hoverable="true">Side projects</a>
+          <a href="/work" data-hoverable="true">How I work</a>
+          <a href="/writing" data-hoverable="true">Writing</a>
+          <a href="/about" data-hoverable="true">Working with me</a>
+          <a href="/side-projects" data-hoverable="true">Side projects</a>
         </div>
       </div>
 
@@ -216,14 +235,14 @@ function Home({ revisit = false }: { revisit?: boolean }) {
         <div className="bottom-left">
           <a href="https://www.linkedin.com/in/oluwafemi-joshua/" target="_blank" rel="noreferrer" data-hoverable="true">LinkedIn →</a>
           <a href="https://github.com/jarvis-create" target="_blank" rel="noreferrer" data-hoverable="true">GitHub →</a>
-          <a href="#/shelf" data-hoverable="true" style={{ marginTop: '4px' }}>Shelf →</a>
+          <a href="/shelf" data-hoverable="true" style={{ marginTop: '4px' }}>Shelf →</a>
         </div>
         <div className="bottom-right">
           <p>5 years building products</p>
           <p>that solve human problems</p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -272,7 +291,7 @@ function WorkPage() {
     return () => sio.disconnect();
   }, []);
 
-  const scrollTo = (id: string) => (e: React.MouseEvent) => {
+  const scrollTo = (id: string) => (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
@@ -286,7 +305,7 @@ function WorkPage() {
             How I<br /><em>work.</em>
           </h1>
         </div>
-        <nav className="rail-nav">
+        <nav className="rail-nav" aria-label="Work section navigation">
           <a className="rn" href="#origin" data-s="origin" onClick={scrollTo("origin")}>
             <span className="rn-num">01</span>Origin
           </a>
@@ -304,14 +323,14 @@ function WorkPage() {
           </a>
         </nav>
         <div>
-          <a className="nav-back" href="#/home">← Home</a>
+          <a className="nav-back" href="/">← Home</a>
           <a className="rail-cta" href="https://calendly.com/joshuaojo/15min" target="_blank" rel="noreferrer">
             Start a conversation <span aria-hidden="true">→</span>
           </a>
         </div>
       </aside>
 
-      <div className="content">
+      <main className="content">
         <div className="essay">
 
           {/* 01 — Origin */}
@@ -459,7 +478,7 @@ function WorkPage() {
           </div>
 
         </div>
-      </div>
+      </main>
     </>
   );
 }
@@ -469,7 +488,7 @@ function AboutPage() {
     <>
       <section className="about-split">
         <aside className="about-left">
-          <a href="#/home" className="nav-back" data-hoverable="true">← Back</a>
+          <a href="/" className="nav-back" data-hoverable="true">← Back</a>
           <div className="about-metrics">
             <div className="about-metric"><span className="m-num">5</span><span className="m-text">Years building products in early-stage & growth environments</span></div>
             <div className="about-metric"><span className="m-num">35%</span><span className="m-text">Free → paid conversion on 2.3k signups, H1 2024</span></div>
@@ -485,7 +504,7 @@ function AboutPage() {
         <main className="about-right">
           <div className="about-content">
             <div className="about-photo-wrap">
-              <img src="/oluwafemi-joshua.png" alt="Oluwafemi Joshua" className="about-photo" />
+              <img src="/oluwafemi-joshua.png" alt="Oluwafemi Joshua" className="about-photo" width={1182} height={736} loading="lazy" decoding="async" />
             </div>
             <p className="about-label">Working with me</p>
             <h1 className="about-title">The PM who makes<br />the team ask<br /><em>better questions.</em></h1>
@@ -509,7 +528,7 @@ function WritingPage() {
           <p className="wp-eyebrow">Writing</p>
           <h1 className="wp-title">I write when something<br />bothers me <em>enough.</em></h1>
         </div>
-        <a href="#/home" className="nav-back">← Back</a>
+        <a href="/" className="nav-back">← Back</a>
       </header>
 
       {/* Body - Two columns */}
@@ -527,17 +546,17 @@ function WritingPage() {
           <div className="wp-articles">
             <a href="https://medium.com/@oluwafemi-joshua/principle-zero-evals-are-all-you-need-d57d989d693e" target="_blank" rel="noreferrer" className="wp-article">
               <p className="wa-date">Oct 2025</p>
-              <p className="wa-title">Practical Notes on setting up AI Evals for your business</p>
+              <h2 className="wa-title">Practical Notes on setting up AI Evals for your business</h2>
               <p className="wa-excerpt">The best evals come from teams who've done the hard work of truly understanding their problem space</p>
             </a>
             <a href="https://medium.com/@oluwafemi-joshua/i2p-probing-the-need-for-a-better-digital-life-archive-part-1-6c3cd941db90" target="_blank" rel="noreferrer" className="wp-article">
               <p className="wa-date">Oct 2025</p>
-              <p className="wa-title">Probing The Need for a Better Digital Life Archive</p>
+              <h2 className="wa-title">Probing The Need for a Better Digital Life Archive</h2>
               <p className="wa-excerpt">For some time now, I have been oddly fascinated with death and how it interacts with the lives we live</p>
             </a>
             <div className="wp-article placeholder">
               <p className="wa-date">— —</p>
-              <p className="wa-title">More coming</p>
+              <h2 className="wa-title">More coming</h2>
               <p className="wa-excerpt">Writing in bursts. More when something bothers me enough to say it.</p>
             </div>
           </div>
@@ -556,12 +575,12 @@ function WritingPage() {
           <div className="wp-articles">
             <a href="https://open.substack.com/pub/oluwafemijoshua/p/dont-stop-drowning?utm_campaign=post-expanded-share&utm_medium=web" target="_blank" rel="noreferrer" className="wp-article">
               <p className="wa-date">Jun 2025</p>
-              <p className="wa-title">Don't Drown</p>
+              <h2 className="wa-title">Don't Drown</h2>
               <p className="wa-excerpt">At first thought, it feels like it should be natural to self — that we should want love for ourselves and seek it like the blood-crazed sharks I'm starting to think we are</p>
             </a>
             <div className="wp-article placeholder">
               <p className="wa-date">— —</p>
-              <p className="wa-title">More coming</p>
+              <h2 className="wa-title">More coming</h2>
               <p className="wa-excerpt">This one gets personal. Subscribe if you want to be in the room while I'm still figuring it out.</p>
             </div>
           </div>
@@ -590,7 +609,7 @@ function SideProjectsPage() {
           <p className="sp-eyebrow">Side Projects</p>
           <h1 className="sp-title">Things I build when<br />nobody's <em>paying me.</em></h1>
         </div>
-        <a href="#/home" className="nav-back nav-back--light">← Back</a>
+        <a href="/" className="nav-back nav-back--light">← Back</a>
       </header>
 
       <div className="sp-grid">
@@ -632,21 +651,21 @@ function ShelfPage() {
   const currentYear = new Date().getFullYear();
   return (
     <>
-      <nav className="top-nav">
+      <nav className="top-nav" aria-label="Site navigation">
         <span className="nav-name">Oluwafemi Joshua</span>
         <ul className="nav-links">
-          <li><a href="#/home" data-hoverable="true">Home</a></li>
-          <li><a href="#/work" data-hoverable="true">How I work</a></li>
-          <li><a href="#/about" data-hoverable="true">Working with me</a></li>
-          <li><a href="#/side-projects" data-hoverable="true">Side projects</a></li>
-          <li><a href="#/shelf" data-hoverable="true" style={{ opacity: 0.8 }}>Shelf</a></li>
+          <li><a href="/" data-hoverable="true">Home</a></li>
+          <li><a href="/work" data-hoverable="true">How I work</a></li>
+          <li><a href="/about" data-hoverable="true">Working with me</a></li>
+          <li><a href="/side-projects" data-hoverable="true">Side projects</a></li>
+          <li><a href="/shelf" data-hoverable="true" style={{ opacity: 0.8 }}>Shelf</a></li>
         </ul>
       </nav>
 
       {/* ── HERO ── */}
       <section className="sh-hero">
         <div className="sh-hero-bg-text" aria-hidden="true">Reading &amp; Listening</div>
-        <a className="nav-back nav-back--light sh-back" href="#/home" data-hoverable="true">← Back</a>
+        <a className="nav-back nav-back--light sh-back" href="/" data-hoverable="true">← Back</a>
         <div className="sh-hero-eyebrow">002 / Shelf</div>
         <h1 className="sh-hero-title">Reading &amp;<br /><em>Listening.</em></h1>
         <p className="sh-hero-desc">Directory of books I've enjoyed so far and music that I think otherworldly</p>
@@ -659,7 +678,7 @@ function ShelfPage() {
       <div className="sh-section">
         <div className="sh-section-header">
           <span className="sh-section-number">01</span>
-          <span className="sh-section-label">Reading</span>
+          <h2 className="sh-section-label">Reading</h2>
         </div>
 
         <p className="sh-sublabel">Currently on the nightstand</p>
@@ -719,7 +738,7 @@ function ShelfPage() {
       <div className="sh-section">
         <div className="sh-section-header">
           <span className="sh-section-number">02</span>
-          <span className="sh-section-label">Listening</span>
+          <h2 className="sh-section-label">Listening</h2>
         </div>
 
         <p className="sh-sublabel" style={{ marginBottom: 30 }}>On repeat</p>
