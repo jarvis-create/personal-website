@@ -74,7 +74,14 @@ body::before {
   overflow: hidden;
 }
 @media (max-width: 768px) {
-  .page { padding: 24px; height: 100dvh; }
+  .page {
+    padding: 24px;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 /* top-left: name */
@@ -104,7 +111,7 @@ body::before {
   opacity: 1;
 }
 @media (max-width: 768px) {
-  .status-block { top: 24px; right: 24px; }
+  .status-block { display: none; }
 }
 .status-block p {
   font-family: 'DM Mono', monospace;
@@ -139,7 +146,21 @@ body::before {
   padding: 0 48px;
 }
 @media (max-width: 768px) {
-  .centre { padding: 0 24px; }
+  .centre {
+    position: static;
+    transform: none;
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  .centre-kicker { margin-bottom: 20px; }
+  .centre-headline { margin-bottom: 24px; }
+  .centre-roleline { margin-bottom: 28px; }
+  .centre-question { margin-bottom: 32px; min-height: auto; font-size: 16px; }
 }
 
 .centre-kicker {
@@ -228,11 +249,16 @@ body::before {
   opacity: 1;
 }
 @media (max-width: 600px) {
-  .centre-question { min-height: 5.1em; } /* more room for wrapping on narrow screens */
-  .centre-nav { flex-direction: column; max-width: 240px; margin: 0 auto; }
+  .centre-nav { flex-direction: column; max-width: 280px; margin: 0 auto; }
   .centre-nav a { border-right: 1px solid var(--rule) !important; border-bottom: none; }
   .centre-nav a:last-child { border-bottom: 1px solid var(--rule); }
   .centre-nav a:hover + a { border-top-color: var(--ink); border-left-color: var(--rule); }
+}
+
+/* Very small screens (iPhone SE, etc.) */
+@media (max-width: 400px) {
+  .centre-headline { font-size: clamp(36px, 10vw, 48px); }
+  .centre-kicker { font-size: 10px; }
 }
 
 .centre-nav a {
@@ -270,7 +296,14 @@ body::before {
   opacity: 1;
 }
 @media (max-width: 768px) {
-  .bottom-bar { bottom: 24px; left: 24px; right: 24px; flex-direction: column-reverse; align-items: center; gap: 24px; text-align: center; }
+  .bottom-bar {
+    position: static;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+    padding-top: 32px;
+  }
   .bottom-right { text-align: center !important; }
 }
 
@@ -303,18 +336,9 @@ body::before {
   margin: 0;
 }
 
-/* thin vertical rule — visual anchor */
+/* thin vertical rule — visual anchor (disabled) */
 .v-rule {
-  position: absolute;
-  left: 50%;
-  top: 0; bottom: 0;
-  width: 1px;
-  background: var(--rule);
-  opacity: 1;
-  pointer-events: none;
-}
-@media (max-width: 768px) {
-  .v-rule { display: none; }
+  display: none;
 }
 
 
