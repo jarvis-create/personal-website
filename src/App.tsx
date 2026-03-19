@@ -20,14 +20,14 @@ export default function Prototype({ initialPath }: { initialPath?: string } = {}
   });
   const homeVisitCount = useRef(0);
 
-  // SPA navigation helper — intercepts clicks on internal links
+  // SPA navigation helper - intercepts clicks on internal links
   const handleNav = useCallback((e: MouseEvent<HTMLElement>) => {
     const anchor = (e.target as HTMLElement).closest("a");
     if (!anchor) return;
     const href = anchor.getAttribute("href");
     if (!href || !href.startsWith("/") || href.startsWith("//")) return;
     if (anchor.target === "_blank") return;
-    // In-page scroll anchors (e.g. #origin) — let browser handle
+    // In-page scroll anchors (e.g. #origin) - let browser handle
     if (href.includes("#")) return;
     e.preventDefault();
     if (href !== window.location.pathname) {
@@ -36,7 +36,7 @@ export default function Prototype({ initialPath }: { initialPath?: string } = {}
     }
   }, []);
 
-  // Handle legacy hash routes — redirect #/work to /work
+  // Handle legacy hash routes - redirect #/work to /work
   useEffect(() => {
     const hash = window.location.hash;
     if (hash.startsWith("#/")) {
@@ -115,6 +115,30 @@ const TYPED_LINES = [
   "The one in the room asking 'but what problem are we actually solving?'",
   "Building products in early-stage and growth environments since 2021.",
 ];
+
+function LinkedInIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M6.94 8.5H3.56V20h3.38V8.5ZM5.25 3A1.96 1.96 0 1 0 5.3 6.92 1.96 1.96 0 0 0 5.25 3Zm15.19 9.9c0-3.47-1.85-5.08-4.32-5.08-1.99 0-2.88 1.09-3.38 1.85V8.5H9.38c.04.78 0 11.5 0 11.5h3.36v-6.42c0-.34.02-.68.12-.92.27-.68.87-1.38 1.89-1.38 1.33 0 1.87 1.01 1.87 2.5V20H20v-7.1Z" fill="currentColor"/>
+    </svg>
+  );
+}
+
+function GitHubIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 2C6.48 2 2 6.58 2 12.23c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.5 0-.24-.01-1.04-.01-1.88-2.78.62-3.37-1.2-3.37-1.2-.46-1.2-1.11-1.52-1.11-1.52-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.58 2.36 1.12 2.94.85.09-.67.35-1.12.64-1.38-2.22-.26-4.55-1.14-4.55-5.08 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.3 9.3 0 0 1 12 6.9c.85 0 1.7.12 2.5.35 1.9-1.33 2.74-1.05 2.74-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.95-2.33 4.82-4.56 5.08.36.32.68.95.68 1.92 0 1.39-.01 2.5-.01 2.84 0 .28.18.6.69.5A10.24 10.24 0 0 0 22 12.23C22 6.58 17.52 2 12 2Z" fill="currentColor"/>
+    </svg>
+  );
+}
+
+function LibraryIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4.5 5.5A1.5 1.5 0 0 1 6 4h10.25A1.75 1.75 0 0 1 18 5.75V18a2 2 0 0 0 2 2H7.25A2.75 2.75 0 0 1 4.5 17.25V5.5Zm2 .5v11.25c0 .41.34.75.75.75H16V6H6.5Zm12 2.25V18a3.95 3.95 0 0 0 .4 2H20a.5.5 0 0 0 0-1h-.5V8.25h-1Z" fill="currentColor"/>
+    </svg>
+  );
+}
 
 function useTypedLine(lines: string[], skipInitialDelay = false) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -233,9 +257,21 @@ function Home({ revisit = false }: { revisit?: boolean }) {
 
       <div className="bottom-bar">
         <div className="bottom-left">
-          <a href="https://www.linkedin.com/in/oluwafemi-joshua/" target="_blank" rel="noreferrer" data-hoverable="true">LinkedIn →</a>
-          <a href="https://github.com/jarvis-create" target="_blank" rel="noreferrer" data-hoverable="true">GitHub →</a>
-          <a href="/shelf" data-hoverable="true" style={{ marginTop: '4px' }}>Shelf →</a>
+          <a href="https://www.linkedin.com/in/oluwafemi-joshua/" target="_blank" rel="noreferrer" data-hoverable="true" className="bottom-link">
+            <span className="bottom-link-icon"><LinkedInIcon /></span>
+            <span>LinkedIn</span>
+            <span aria-hidden="true">→</span>
+          </a>
+          <a href="https://github.com/jarvis-create" target="_blank" rel="noreferrer" data-hoverable="true" className="bottom-link">
+            <span className="bottom-link-icon"><GitHubIcon /></span>
+            <span>GitHub</span>
+            <span aria-hidden="true">→</span>
+          </a>
+          <a href="/shelf" data-hoverable="true" className="bottom-link bottom-link--library">
+            <span className="bottom-link-icon"><LibraryIcon /></span>
+            <span>Library</span>
+            <span aria-hidden="true">→</span>
+          </a>
         </div>
         <div className="bottom-right">
           <p>5 years building products</p>
@@ -318,8 +354,8 @@ function WorkPage() {
           <a className="rn" href="#ai" data-s="ai" onClick={scrollTo("ai")}>
             <span className="rn-num">04</span>On AI
           </a>
-          <a className="rn" href="#evidence" data-s="evidence" onClick={scrollTo("evidence")}>
-            <span className="rn-num">05</span>Evidence
+          <a className="rn" href="#selected-work" data-s="selected-work" onClick={scrollTo("selected-work")}>
+            <span className="rn-num">05</span>Selected Work
           </a>
         </nav>
         <div>
@@ -333,12 +369,12 @@ function WorkPage() {
       <main className="content">
         <div className="essay">
 
-          {/* 01 — Origin */}
+          {/* 01 Origin */}
           <div className="ch" id="origin">
-            <p className="ch-tag">01 — Origin</p>
+            <p className="ch-tag">01 Origin</p>
             <h2 className="ch-h">I think in systems.<br />I always <em>have.</em></h2>
             <p>
-              I trained as a Chemical Engineer. Not because I wanted to work in oil — because I wanted to understand how things <em>work</em>. How inputs become outputs. How small variables change everything downstream. How the failure of one component quietly breaks the whole.
+              I trained as a Chemical Engineer because I wanted to work in oil. I did, for some of the biggest companies in the industry. It wasn't for me. But what I took from it was how to think from first principles. How to create value from raw, messy inputs. How small variables change everything downstream. How the failure of one component quietly breaks the whole.
             </p>
             <p>
               That's still how I think. I came into product through the unglamorous side: requirements gathering, QA, enterprise transformation work where the client doesn't tell you the real problem until week three. I learned to wait for it.
@@ -348,33 +384,33 @@ function WorkPage() {
 
           <div className="divider"></div>
 
-          {/* 02 — Approach */}
+          {/* 02 Approach */}
           <div className="ch" id="approach">
-            <p className="ch-tag">02 — Approach</p>
-            <h2 className="ch-h">Discovery before<br />solution. <em>Always.</em></h2>
+            <p className="ch-tag">02 Approach</p>
+            <h2 className="ch-h">Discovery before<br />momentum. <em>Always.</em></h2>
             <p>
-              Most teams ship the wrong thing faster than the right thing. They optimise for velocity before they've earned the right to move fast. I've seen what happens: six months of sprint velocity and then a pivot because nobody stopped to ask whether the problem was real.
+              Most teams don't fail because they move too slowly. They fail because they build confidence around the wrong problem. I've learned to spend more time where uncertainty is highest, not to delay shipping, but to make later decisions cheaper, clearer, and easier to defend.
             </p>
             <p>
-              My default is to slow down at the beginning so I can move fast later. I'll spend twice as long in the problem space if it means I ship something that doesn't need to be thrown away.
+              My default is to create structure early: better questions, sharper hypotheses, prototypes that are honest about what they're testing, and enough clarity to know what success should look like before a team starts optimizing for speed.
             </p>
             <p className="pull">The question nobody asked is usually the one that unlocks everything.</p>
             <p>
-              In practice: discovery sessions that feel like conversations. Prototypes honest about what they're testing. Hypotheses written before sprint planning, not after. And the willingness to say "we don't know enough yet" in a room full of people who want to ship.
+              AI is compressing this in useful ways. I'm using it to run more experiments in the problem space faster, stress-test assumptions that used to take weeks, and surface edge cases earlier. The discipline stays the same. The velocity is new. Discovery still comes first, but now the window between hypothesis and evidence is shorter.
             </p>
           </div>
 
           <div className="divider"></div>
 
-          {/* 03 — Philosophy */}
+          {/* 03 Philosophy */}
           <div className="ch" id="philosophy">
-            <p className="ch-tag">03 — Philosophy</p>
+            <p className="ch-tag">03 Philosophy</p>
             <h2 className="ch-h">What I actually<br /><em>believe.</em></h2>
             <p>Not values from a workshop. Things I've been wrong about, then right about, enough times that I just hold them now.</p>
             <div className="principles">
               <div className="principle">
                 <span className="p-n">01</span>
-                <p className="p-t"><strong>The product is never the point.</strong> The human problem is. Every feature, every sprint — if I can't trace it back to a real human pain, I get suspicious.</p>
+                <p className="p-t"><strong>The product is never the point.</strong> The human problem is. Every feature, every sprint - if I can't trace it back to a real human pain, I get suspicious.</p>
               </div>
               <div className="principle">
                 <span className="p-n">02</span>
@@ -397,61 +433,78 @@ function WorkPage() {
 
           <div className="divider"></div>
 
-          {/* 04 — On AI */}
+          {/* 04 On AI */}
           <div className="ch" id="ai">
-            <p className="ch-tag">04 — On AI</p>
+            <p className="ch-tag">04 On AI</p>
             <h2 className="ch-h">A collaborator.<br />Not a <em>shortcut.</em></h2>
             <p>
-              I've spent the better part of the last two years building AI-native products and evaluation frameworks. That changes how you think about what "done" means — with LLMs, done isn't a state, it's a dial.
+              I've spent the better part of the last two years building AI-native products and evaluation frameworks. That changes how you think about what "done" means. With LLMs, done isn't a state, it's a dial.
             </p>
             <div className="inset">
               <p className="inset-tag">What I built at Tech1M</p>
               <p>
-                Evaluation and guardrails framework for LLM features — <strong>content relevance, groundedness scoring, PII safeguards, rubric-based output evaluation.</strong> Goal was stabilising quality before GA, not patching after.
+                Evaluation and guardrails framework for LLM features: <strong>content relevance, groundedness scoring, PII safeguards, rubric-based output evaluation.</strong> Goal was stabilising quality before GA, not patching after.
               </p>
             </div>
             <p>
               The teams getting the most from AI understand their problem space deeply enough to evaluate the output. You can't prompt your way out of not knowing what you're solving for.
             </p>
             <p>
-              I'm also thinking about what AI does to the humans using the products. That's the question I don't think enough PMs are asking. I'm asking it.
+              I'm also thinking about what AI does to the humans using the products. That's the question I don't think enough PMs are asking.
             </p>
           </div>
 
           <div className="divider"></div>
 
-          {/* 05 — Evidence */}
-          <div className="ch" id="evidence">
-            <p className="ch-tag">05 — Evidence</p>
-            <h2 className="ch-h">What the work<br />actually <em>produced.</em></h2>
-            <p>Numbers are honest. They're also not the whole story — ask me about the experiments that failed.</p>
-            <div className="stats">
-              <div>
-                <span className="stat-n">35%</span>
-                <span className="stat-l">Free → paid conversion<br />2.3k signups, H1 2024</span>
-              </div>
-              <div>
-                <span className="stat-n">$120k</span>
-                <span className="stat-l">Pilot revenue<br />under 6 months</span>
-              </div>
-              <div>
-                <span className="stat-n">50k+</span>
-                <span className="stat-l">Users on enterprise<br />rollout at Tedbree</span>
-              </div>
-              <div>
-                <span className="stat-n">95%</span>
-                <span className="stat-l">CSAT through full<br />enterprise deployment</span>
-              </div>
+          {/* 05 Selected Work */}
+          <div className="ch" id="selected-work">
+            <p className="ch-tag">05 Selected Work</p>
+            <h2 className="ch-h">Work that<br /><em>held up.</em></h2>
+            <div className="work-grid">
+              <article className="work-card">
+                <div className="work-card-top">
+                  <span className="work-card-n">01</span>
+                  <span className="work-card-tag">AI quality systems</span>
+                </div>
+                <h3 className="work-card-h">LLM evaluation and guardrails</h3>
+                <p className="work-card-copy">Built evaluation frameworks for AI-powered product experiences, including groundedness, relevance, and safety checks, to make output quality measurable before broader rollout.</p>
+              </article>
+              <article className="work-card">
+                <div className="work-card-top">
+                  <span className="work-card-n">02</span>
+                  <span className="work-card-tag">Enterprise transformation</span>
+                </div>
+                <h3 className="work-card-h">Enterprise rollout at scale</h3>
+                <p className="work-card-copy">Led work on a large enterprise transformation affecting 50,000+ partners, with 99.9% uptime post-launch and 75% adoption within three months.</p>
+              </article>
+              <article className="work-card">
+                <div className="work-card-top">
+                  <span className="work-card-n">03</span>
+                  <span className="work-card-tag">Payments infrastructure</span>
+                </div>
+                <h3 className="work-card-h">Payments reliability across markets</h3>
+                <p className="work-card-copy">Worked on payment systems spanning 60+ countries, shaping validation logic and edge-case handling in flows where downstream failures were expensive.</p>
+              </article>
+              <article className="work-card">
+                <div className="work-card-top">
+                  <span className="work-card-n">04</span>
+                  <span className="work-card-tag">Regulated operations</span>
+                </div>
+                <h3 className="work-card-h">Regulated workflow design</h3>
+                <p className="work-card-copy">Redesigned onboarding and operational flows in environments where ambiguity created compliance and execution risk.</p>
+              </article>
             </div>
-            <p>
-              Led a full enterprise transformation at Tedbree serving 50,000+ partners as the sole technical analyst. Kept 99.9% uptime post-launch and 75% user adoption within three months.
-            </p>
-            <p className="aside">The adoption number is the one I'm most proud of. Getting 75% of 50,000 people to actually change how they work in 90 days — that's a product and people problem solved together.</p>
+            <div className="work-reflection">
+              <p className="work-reflection-kicker">What matters to me</p>
+              <p>
+                I care less about flashy metrics than whether the work held up under real constraints. The projects I'm proudest of are the ones where quality became clearer, risk got reduced earlier, and teams could move with more confidence because the system made more sense.
+              </p>
+            </div>
           </div>
 
           {/* Closer */}
           <div className="closer">
-            <h2 className="closer-h">If this sounds like<br />someone you want<br />in the <em>room —</em></h2>
+            <h2 className="closer-h">If this sounds like<br />someone you want<br />in the <em>room.</em></h2>
             <p className="closer-note">I'm easy to reach and enjoy a good conversation about hard problems. No pitch needed.</p>
             <div className="contact-list">
               <a href="mailto:joshuaojo33@gmail.com" className="contact-item" data-hoverable="true">
@@ -508,7 +561,7 @@ function AboutPage() {
             </div>
             <p className="about-label">Working with me</p>
             <h1 className="about-title">The PM who makes<br />the team ask<br /><em>better questions.</em></h1>
-            <p className="about-copy">I trained as a Chemical Engineer. I came into product through the unglamorous side — requirements gathering, QA, enterprise transformation where the real problem doesn't surface until week three. I like it there.</p>
+            <p className="about-copy">I trained as a Chemical Engineer. I came into product through the unglamorous side: requirements gathering, QA, enterprise transformation where the real problem doesn't surface until week three. I like it there.</p>
             <p className="about-copy">What I bring doesn't fit a job description. I'll sit with a problem until I find the question nobody else asked. I default to <em>discovery before solution</em>. And I care, genuinely, about the humans behind the metrics.</p>
             <p className="about-copy">Currently at Tech1M running product strategy end to end. AI-native products, PLG, and the unglamorous work of making things actually stick.</p>
           </div>
@@ -555,7 +608,7 @@ function WritingPage() {
               <p className="wa-excerpt">For some time now, I have been oddly fascinated with death and how it interacts with the lives we live</p>
             </a>
             <div className="wp-article placeholder">
-              <p className="wa-date">— —</p>
+              <p className="wa-date">- -</p>
               <h2 className="wa-title">More coming</h2>
               <p className="wa-excerpt">Writing in bursts. More when something bothers me enough to say it.</p>
             </div>
@@ -576,10 +629,10 @@ function WritingPage() {
             <a href="https://open.substack.com/pub/oluwafemijoshua/p/dont-stop-drowning?utm_campaign=post-expanded-share&utm_medium=web" target="_blank" rel="noreferrer" className="wp-article">
               <p className="wa-date">Jun 2025</p>
               <h2 className="wa-title">Don't Drown</h2>
-              <p className="wa-excerpt">At first thought, it feels like it should be natural to self — that we should want love for ourselves and seek it like the blood-crazed sharks I'm starting to think we are</p>
+              <p className="wa-excerpt">At first thought, it feels like it should be natural to self, that we should want love for ourselves and seek it like the blood-crazed sharks I'm starting to think we are</p>
             </a>
             <div className="wp-article placeholder">
-              <p className="wa-date">— —</p>
+              <p className="wa-date">- -</p>
               <h2 className="wa-title">More coming</h2>
               <p className="wa-excerpt">This one gets personal. Subscribe if you want to be in the room while I'm still figuring it out.</p>
             </div>
@@ -613,16 +666,17 @@ function SideProjectsPage() {
       </header>
 
       <div className="sp-grid">
-        <article className="sp-card">
-          <p className="sp-status"><span className="sp-status-dash">—</span> Coming soon</p>
-          <h2 className="sp-name">Iterance</h2>
-          <p className="sp-desc">AI-enabled personal knowledge management. Your second brain — actually useful. Built on the idea that most notes apps are just graveyards.</p>
+        <article className="sp-card sp-card--live">
+          <p className="sp-status"><span className="sp-status-dash">-</span> Live now</p>
+          <h2 className="sp-name">Useiterance</h2>
+          <p className="sp-desc">Useiterance is not a notes app, a passive read-later list, or a bookmarking tool. It's a reinforcement platform, a retention engine, and a learning system for the things you actually want to know.</p>
+          <a href="https://app.useiterance.com" target="_blank" rel="noreferrer" className="sp-card-cta">Try now <span aria-hidden="true">↗</span></a>
           <span className="sp-ghost">01</span>
           <div className="sp-tags"><span>AI/ML</span><span>RAG</span><span>B2C</span></div>
         </article>
 
         <article className="sp-card">
-          <p className="sp-status"><span className="sp-status-dash">—</span> Coming soon</p>
+          <p className="sp-status"><span className="sp-status-dash">-</span> Coming soon</p>
           <h2 className="sp-name">Student Helper</h2>
           <p className="sp-desc">Personalised study assistant for early learners. Less tutoring app, more thinking partner. Designed so that it makes students sharper, not dependent.</p>
           <span className="sp-ghost">02</span>
@@ -630,7 +684,7 @@ function SideProjectsPage() {
         </article>
 
         <article className="sp-card">
-          <p className="sp-status"><span className="sp-status-dash">—</span> Exploring</p>
+          <p className="sp-status"><span className="sp-status-dash">-</span> Exploring</p>
           <h2 className="sp-name">Death Note</h2>
           <p className="sp-desc">Experimental heirloom system for digital legacies. The question nobody's answered properly: what happens to who you were online when you're gone?</p>
           <span className="sp-ghost">03</span>
@@ -639,7 +693,7 @@ function SideProjectsPage() {
       </div>
 
       <footer className="sp-footer">
-        <p className="sp-footer-text">All three are live questions I can't stop thinking about — not just roadmap items. Ask me about any of them.</p>
+        <p className="sp-footer-text">All three are live questions I can't stop thinking about, not just roadmap items. Ask me about any of them.</p>
         <a href="https://calendly.com/joshuaojo/15min" target="_blank" rel="noreferrer" className="sp-footer-cta">Start a conversation →</a>
         <span className="sp-footer-dot"></span>
       </footer>
@@ -759,7 +813,7 @@ function ShelfPage() {
           <div>
             <div className="sh-pl-meta">The Mix</div>
             <div className="sh-pl-title">Live Playlist</div>
-            <div className="sh-pl-desc">A running mix of everything I'm listening to. Post-rock, ambient — the kind of music that makes you stare out of windows.</div>
+            <div className="sh-pl-desc">A running mix of everything I'm listening to. Post-rock, ambient, the kind of music that makes you stare out of windows.</div>
           </div>
           <span className="sh-pl-arr">→</span>
         </a>
