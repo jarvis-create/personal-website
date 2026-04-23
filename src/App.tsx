@@ -235,6 +235,7 @@ function Home({ revisit = false }: { revisit?: boolean }) {
         <h1 className="centre-headline">
           I build products<br />worth getting<br /><em>obsessed with.</em>
         </h1>
+        <h2 className="sr-only">Oluwafemi Joshua</h2>
         <p className="centre-roleline">Technical Product Manager & <span>Writer</span></p>
         <p className="centre-question">
           <span ref={typedRef}>{TYPED_LINES[0]}</span>
@@ -333,6 +334,7 @@ function WorkPage() {
           <h1 className="rail-title">
             How I<br /><em>work.</em>
           </h1>
+          <h2 className="sr-only">How Oluwafemi Joshua Works</h2>
         </div>
         <nav className="rail-nav" aria-label="Work section navigation">
           <a className="rn" href="#origin" data-s="origin" onClick={scrollTo("origin")}>
@@ -554,6 +556,7 @@ function AboutPage() {
             </div>
             <p className="about-label">Working with me</p>
             <h1 className="about-title">The PM who makes<br />the team ask<br /><em>better questions.</em></h1>
+            <h2 className="sr-only">About Oluwafemi Joshua</h2>
             <p className="about-copy">I trained as a Chemical Engineer. I came into product through the unglamorous side: requirements gathering, QA, enterprise transformation where the real problem doesn't surface until week three. I like it there.</p>
             <p className="about-copy">What I bring doesn't fit a job description. I'll sit with a problem until I find the question nobody else asked. I default to <em>discovery before solution</em>. And I care, genuinely, about the humans behind the metrics.</p>
             <p className="about-copy">Currently at Tech1M running product strategy end to end. AI-native products, PLG, and the unglamorous work of making things actually stick.</p>
@@ -573,6 +576,7 @@ function WritingPage() {
         <div>
           <p className="wp-eyebrow">Writing</p>
           <h1 className="wp-title">I write when something<br />bothers me <em>enough.</em></h1>
+          <h2 className="sr-only">Writing by Oluwafemi Joshua</h2>
         </div>
         <a href="/" className="nav-back">← Back</a>
       </header>
@@ -654,6 +658,7 @@ function SideProjectsPage() {
         <div>
           <p className="sp-eyebrow">Side Projects</p>
           <h1 className="sp-title">Things I build when<br />nobody's <em>paying me.</em></h1>
+          <h2 className="sr-only">Side Projects by Oluwafemi Joshua</h2>
         </div>
         <a href="/" className="nav-back nav-back--light">← Back</a>
       </header>
@@ -715,6 +720,7 @@ function ShelfPage() {
         <a className="nav-back nav-back--light sh-back" href="/" data-hoverable="true">← Back</a>
         <div className="sh-hero-eyebrow">002 / Shelf</div>
         <h1 className="sh-hero-title">Reading &amp;<br /><em>Listening.</em></h1>
+        <h2 className="sr-only">Oluwafemi Joshua's Shelf</h2>
         <p className="sh-hero-desc">Directory of books I've enjoyed so far and music that I think otherworldly</p>
         <div className="sh-hero-scroll" aria-hidden="true">Scroll</div>
       </section>
