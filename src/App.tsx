@@ -1,17 +1,6 @@
 import { useEffect, useRef, useState, useCallback, type MouseEvent } from "react";
 import "./styles/editorial.css";
-
-type Route = "home" | "work" | "writing" | "about" | "side-projects" | "shelf";
-
-function parseRoute(pathname: string): Route {
-  const p = pathname.toLowerCase().replace(/\/+$/, "") || "/";
-  if (p.startsWith("/work")) return "work";
-  if (p.startsWith("/shelf")) return "shelf";
-  if (p.startsWith("/about")) return "about";
-  if (p.startsWith("/side-projects")) return "side-projects";
-  if (p.startsWith("/writing")) return "writing";
-  return "home";
-}
+import { applySeoToDocument, getSeoForPath, parseRoute, type Route } from "./seo";
 
 export default function Prototype({ initialPath }: { initialPath?: string } = {}) {
   const [route, setRoute] = useState<Route>(() => {
@@ -55,6 +44,10 @@ export default function Prototype({ initialPath }: { initialPath?: string } = {}
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
+  }, [route]);
+
+  useEffect(() => {
+    applySeoToDocument(getSeoForPath(window.location.pathname));
   }, [route]);
 
   // Scroll reveal
@@ -244,7 +237,7 @@ function Home({ revisit = false }: { revisit?: boolean }) {
         </h1>
         <p className="centre-roleline">Technical Product Manager & <span>Writer</span></p>
         <p className="centre-question">
-          <span ref={typedRef}></span>
+          <span ref={typedRef}>{TYPED_LINES[0]}</span>
           <span className="typed-cursor" aria-hidden="true"></span>
         </p>
         <div className="centre-nav">

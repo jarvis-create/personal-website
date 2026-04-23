@@ -22,8 +22,10 @@ const template = fs.readFileSync(templatePath, "utf8");
 const { render } = await import(pathToFileURL(serverEntryPath).href);
 
 for (const route of routes) {
-  const appHtml = render(route);
-  const html = template.replace("<!--ssr-outlet-->", appHtml);
+  const { appHtml, headHtml } = render(route);
+  const html = template
+    .replace(/<!--seo-start-->[\s\S]*?<!--seo-end-->/, `<!--seo-start-->\n    ${headHtml}\n    <!--seo-end-->`)
+    .replace("<!--ssr-outlet-->", appHtml);
 
   const filePath =
     route === "/"
